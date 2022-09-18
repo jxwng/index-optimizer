@@ -28,8 +28,9 @@ class IndexRebalOpt(cp.SinglePeriodOpt):
         :param tracking_error: "each components weight should deviate from CSI300 weight less than 3%"
         :param turnover_limit: "turnover rate should be less than 15%"
         """
-        max_weight_const = cp.MaxWeights((index_weights + tracking_error) * (index_weights > 0))
-        min_weight_const = cp.MinWeights((index_weights - tracking_error) * (index_weights > 0))
+        assert 0 < tracking_error < 1
+        max_weight_const = cp.MaxWeights((index_weights * (1 + tracking_error)) * (index_weights > 0))
+        min_weight_const = cp.MinWeights((index_weights * (1 - tracking_error)) * (index_weights > 0))
         TurnoverLimit(turnover_limit)
         constraints = [cp.LongOnly(), max_weight_const, min_weight_const]
         super(IndexRebalOpt, self).__init__(alpha, costs, constraints)
