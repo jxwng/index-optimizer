@@ -37,18 +37,18 @@ def get_index_weights(index_ticker: str) -> pd.DataFrame:
     return df
 
 
-def download_hist_prices(index_ticker: str, flds: str, start_date: str) -> None:
+def download_index_members_prices(index_ticker: str, flds: str, start_date: str) -> None:
     """
     download historical prices of equities,  in practice this goes to database with start/end date
 
     :param index_ticker: bloomberg index name
     :param flds: bloomberg fields
-    :param start_date: start date in YYYY-MM-DD
+    :param start_date: start date in YYYYMMDD
     :return:
     """
     df_index = get_index_weights(index_ticker)
     df = blp.bdh(df_index.columns, flds, start_date, CshAdjNormal=True, CshAdjAbnormal=True, CapChg=True)
-    df.droplevel(1, axis=1).to_csv(INPUT_FOLDER.joinpath(index_ticker + f' {flds}.csv'))
+    df.droplevel(1, axis=1).to_csv(INPUT_FOLDER.joinpath(index_ticker + f' member_{flds}.csv'))
 
 
 def get_index_members_ret(index_ticker: str) -> pd.DataFrame:
@@ -58,10 +58,35 @@ def get_index_members_ret(index_ticker: str) -> pd.DataFrame:
     :param index_ticker: bloomberg index name
     :return: historical prices of index members
     """
-    df = pd.read_csv(INPUT_FOLDER.joinpath(index_ticker + f' last_price.csv'), parse_dates=True, index_col=0)
+    df = pd.read_csv(INPUT_FOLDER.joinpath(index_ticker + f' member_last_price.csv'), parse_dates=True, index_col=0)
     df = df.reindex(pd.bdate_range(df.index[0], df.index[-1])).ffill().bfill()
     df = df.pct_change().fillna(0)
     return df
+
+
+def download_index_levels(index_ticker: str, flds: str, start_date: str) -> None:
+    """
+    download historical prices of equities,  in practice this goes to database with start/end date
+
+    :param index_ticker: bloomberg index name
+    :param flds: bloomberg fields
+    :param start_date: start date in YYYYMMDD
+    :return:
+    """
+    df = blp.bdh(index_ticker, flds, start_date)
+    df.droplevel(1, axis=1).to_csv(INPUT_FOLDER.joinpath(index_ticker + f' {flds}.csv'))
+
+
+def get_index_ret(index_ticker: str) -> pd.DataFrame:
+    """
+    get index member prices
+
+    :param index_ticker: bloomberg index name
+    :return: historical levels of index
+    """
+    df = pd.read_csv(INPUT_FOLDER.joinpath(index_ticker + f' last_price.csv'), parse_dates=True, index_col=0)
+    df = df.reindex(pd.bdate_range(df.index[0], df.index[-1])).ffill().bfill()
+    return df.pct_change().fillna(0)
 
 
 if __name__ == '__main__':
@@ -72,5 +97,9 @@ if __name__ == '__main__':
     print(get_index_weights(index_name))
 
     # download CSI 300 members historical prices
-    download_hist_prices(index_name, 'last_price', '2016-01-01')
-    # print(get_index_members_ret(index_name))
+    # download_index_members_prices(index_name, 'last_price', '20160101')
+    print(get_index_members_ret(index_name))
+
+    # download CSI 300 index level
+    # download_index_levels(index_name, 'last_price', '20200101')
+    print(get_index_ret(index_name))
