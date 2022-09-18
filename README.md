@@ -55,10 +55,8 @@ me express problem in a natural way that follows the math required by solvers.
 
 #### Requirements explanation:
 1. Initial basket of $10 million CSI300 underlying stocks, with equal weights: implemented in `init_port` in examples
-2. Markowitz optimization: implemented in `opt.py`
+2. Markowitz optimization: utilized `cvxportfolio` framework
 3. Risk calculation: used past 5 years daily data to calculate Cov matrix, implemented in `risk.py`
 4. Each component weight should deviate from CSI300 weight less than 3%: implemented argument `tracking_error` in `opt.py`
-5. Turnover rate should be less than 15%: two solutions -
-   1. preferably, controlled via transaction cost model (implemented as `tcost_model` in examples)
-   2. optionally, can enable `turnover_limit` in `opt.py`, but this is a hard constraint to restrict daily turnover < 15% 
+5. Turnover rate should be less than 15%: `turnover_limit` in `opt.py` 
 6. For alpha, you can generate random number: implemented momentum in `alpha.py`
