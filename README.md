@@ -1,10 +1,4 @@
 # ms-test-optimizer
-Morgan Stanley Delta One Team - Coding Test
-
-### Coding Test
-
-Requirements: Finish independently, internet/google/stackoverflow etc. available. No cooperation, no
-copy & paste.
 
 #### Project:
 Use python to write an optimizer.
